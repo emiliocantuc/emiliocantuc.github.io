@@ -1,0 +1,38 @@
+.markdown-body {
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 45px;
+}
+
+@media (max-width: 767px) {
+    .markdown-body {
+        padding: 15px;
+    }
+
+    .left {
+        width: 100%;
+    }
+
+    .right {
+        width: 100%;
+    }
+
+    .portrait {
+        margin-bottom: 1em;
+    }
+
+    .column-third {
+        float: left;
+        width: 100%;
+    }
+}
+
+html {
+    width: 100vw;
+}
+
+body {
+    overflow-x: hidden;
+}
