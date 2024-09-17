@@ -33,6 +33,8 @@ whoa such empty...
 - [Deep Learning Playground](/dl-playground): Learning and playing around with pytorch by doing textbook exercises, paper reproductions, etc. [ongoing]
 
 ## posts
+
+Highlights: 
 (Partial) paper reproductions:
 
 - [Understanding Batch Norm](dl-playground/understanding-bn/main.html)
