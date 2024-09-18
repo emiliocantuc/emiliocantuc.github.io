@@ -17,7 +17,7 @@ I did my undergrad in Computer Engineering at [ITAM](https://itam.mx/) in Mexico
 
 ecantuc[at]umich[dot]edu
 
-[LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [Twitter](https://twitter.com/emiliocantuc) | [Github](https://github.com/emiliocantuc)
+[LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [Twitter](https://twitter.com/emiliocantuc) | [Github](https://github.com/emiliocantuc) | [Posts](/posts/)
 
 
 whoa such empty...
@@ -34,12 +34,8 @@ whoa such empty...
 
 ## posts
 
-Highlights: 
-(Partial) paper reproductions:
+View full list [here](/posts/). Some highlights:
 
-- [Understanding Batch Norm](dl-playground/understanding-bn/main.html)
-- [Deep Learning is Robust to Massive Label Noise](/dl-playground/dl-massive-label-noise/playground.html)
-
-CS topic explorations:
-
-- (Quick intro): [Approximate Nearest Cosine Neighbors](/cs-playground/quick/lsh/)
+- [Understanding Batch Norm](posts/dl-playground/understanding-bn/main.html)
+- [Deep Learning is Robust to Massive Label Noise](posts/dl-playground/dl-massive-label-noise/playground.html)
+- (Quick intro): [Approximate Nearest Cosine Neighbors](posts/cs-playground/quick/lsh/)
