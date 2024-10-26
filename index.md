@@ -35,6 +35,7 @@ whoa such empty...
 ## posts
 
 View full list [here](/posts/). Some highlights:
+
 - [Understanding Batch Norm](posts/dl-playground/understanding-bn/)
 - [Deep Learning is Robust to Massive Label Noise](posts/dl-playground/dl-massive-label-noise/)
 - (Quick intro): [Approximate Nearest Cosine Neighbors](posts/posts/lsh/)
