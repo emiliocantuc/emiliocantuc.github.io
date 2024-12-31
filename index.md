@@ -20,7 +20,7 @@ listing:
 I did my undergrad in Computer Engineering at [ITAM](https://itam.mx/) in Mexico City and am now pursuing a Master's in Applied Statistics at the University of Michigan.
 
 ::: {.column-margin}
-![](https://emiliocantuc.github.io/assets/pp.jpeg){#pp}
+![](assets/pp.jpeg){#pp}
 :::
 
 ecantuc[at]umich[dot]edu
