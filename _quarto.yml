@@ -1,0 +1,12 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Emilio Cantu-Cervini"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+
