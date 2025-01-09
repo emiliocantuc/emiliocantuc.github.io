@@ -4,7 +4,16 @@ project:
 
 website:
   title: "Emilio Cantu-Cervini"
-
+  repo-url: https://github.com/emiliocantuc/emiliocantuc.github.io
+  repo-actions: [source]
+  page-footer: "<a href='/'>Emilio Cantu-Cervini</a>"
+  search: false
+  navbar:
+    title: false
+    left:
+      - text: "home"
+        href: index.md
+      - posts/index.md
 format:
   html:
     theme: cosmo

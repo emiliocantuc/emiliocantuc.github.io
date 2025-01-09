@@ -1,9 +1,8 @@
 ---
 pagetitle: Emilio Cantu-Cervini
+navbar: false
 format:
   html:
-    minimal: true
-    theme: default
     css: assets/styles.css
 listing:
   id: posts-listing
