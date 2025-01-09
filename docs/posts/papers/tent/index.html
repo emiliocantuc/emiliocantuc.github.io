@@ -156,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>“Entropy is related to error, as more confident predictions are all-in-all more correct (Figure 1). Entropy is related to shifts due to corruption, as more corruption results in more entropy, with a strong rank correlation to the loss for image classification as the level of corruption increases (Figure 2).”</p>
 </blockquote>
-<p>To reproduce Figures 1 &amp; 2 we train a ResNet-26 on CIFAR-10 and evaluate its predictions on corrupted versions of the test set to simulate test-time shifts.</p>
+<p>To reproduce Figures 1 &amp; 2 we train a ResNet on CIFAR-10 and evaluate its predictions on corrupted versions of the test set to simulate test-time shifts.</p>
 <p>(Note: while the authors also show results for CIFAR-100 and ImageNet, we’ll only deal with this small dataset and model for convenience.)</p>
 <div id="cell-4" class="cell" data-execution_count="2">
 <details class="code-fold">
@@ -238,7 +238,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div>
 
 </div>
-<div id="cell-fig-1-2" class="cell quarto-layout-panel" data-layout-ncol="2" data-execution_count="30">
+<div id="cell-fig-1-2" class="cell quarto-layout-panel" data-execution_count="30" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div id="fig-1-2" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -338,7 +338,7 @@ Figure&nbsp;3: TENT produces class distributions with less entropy, concentratin
 </div>
 </div>
 </div>
-<p>Now for evaluation. While the authors consider other baselines, for simplicity, we only compare TENT against the unadapted source model and a test-time normalization <a href="https://arxiv.org/abs/2006.16971">method</a> which just updates the BN statistics during testing.</p>
+<p>Now for evaluation. While the authors consider other baselines, for simplicity, we only compare TENT against the unadapted source model and a test-time normalization <a href="https://arxiv.org/abs/2006.16971">method</a> (“Norm”) which just updates the BN statistics during testing.</p>
 <div id="cell-11" class="cell">
 <details class="code-fold">
 <summary>Eval unadapted model</summary>
@@ -490,7 +490,7 @@ Figure&nbsp;4: TENT &amp; Norm consistently outperform the unadapted model, with
 <div>
 
 </div>
-<div id="cell-fig-grid" class="cell quarto-layout-panel" data-layout-ncol="2" data-execution_count="9">
+<div id="cell-fig-grid" class="cell quarto-layout-panel" data-execution_count="9" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div id="fig-grid" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -518,8 +518,8 @@ Figure&nbsp;6: Mean entropy over test set
 </div>
 </div>
 </div>
-<p>TENT seems quite sensitive to hyperparameters, a <a href="https://arxiv.org/abs/2306.03536">common challenge</a> to all Test-Time Adaptation methods.</p>
-<p>Wrapping up, TENT is a compelling TTA method. You can use a pre-trained model and don’t require test-time labels. Some challenges are that it is limited to classification, is <a href="https://arxiv.org/pdf/2410.10894v1">not well-suited for calibrated</a> (makes models overconfident) or online learning (we need batches), and is sensitive to hyperparameters.</p>
+<p>You can see that TENT seems quite sensitive to hyperparameters, which is a <a href="https://arxiv.org/abs/2306.03536">common challenge</a> to all Test-Time Adaptation methods. There definitely seems to be an entropy sweet-spot – presumably specific to the dataset and shift – controlled by the learning rate and batch size.</p>
+<p>Wrapping up, TENT is a compelling TTA method. You can use a pre-trained model and don’t require test-time labels. However, the technique is limited to classification, <a href="https://arxiv.org/pdf/2410.10894v1">miscalibrates models</a> (makes them overconfident) or online learning (we need batches), and is sensitive to hyperparameters.</p>
 <p><em>All-in-all</em> it was an interesting paper and introduced me to the test-time adaptation literature.</p>
 
 
