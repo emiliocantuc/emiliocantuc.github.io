@@ -8,6 +8,7 @@ website:
   repo-actions: [source]
   page-footer: "<a href='/'>Emilio Cantu-Cervini</a>"
   search: false
+  google-analytics: "G-H4ZD13L2K2"
   navbar:
     title: false
     left:
