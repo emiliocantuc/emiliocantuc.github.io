@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/papers/distilling-knowledge/index.html",
       "/posts/papers/tent/index.html",
       "/posts/others/wolv-events/index.html",
       "/posts/exercises/d2l/9-5.html",
@@ -16,6 +17,7 @@
   {
     "listing": "/posts/index.html",
     "items": [
+      "/posts/papers/distilling-knowledge/index.html",
       "/posts/papers/tent/index.html",
       "/posts/others/wolv-events/index.html",
       "/posts/exercises/d2l/9-5.html",
