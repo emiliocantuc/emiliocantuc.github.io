@@ -206,19 +206,19 @@ window.Quarto = {
 <section id="idea" class="level1">
 <h1>Idea</h1>
 <p>This classic paper introduced <em>distillation</em> as a way of transferring knowledge from a big network teacher into a small one. The core observation is that we should use the big model’s output distribution as soft labels to train the small model.</p>
-<p>Remember that in classification we measure the cross-entropy loss, given the predicted <span class="math inline">\(\hat y_c\)</span> and correct <span class="math inline">\(y_c\)</span> class probabilities of an example <span class="math inline">\(x\)</span>, by:</p>
+<p>Remember that in classification we measure the cross-entropy loss, given the predicted <span class="math inline">\(\hat y_c\)</span> and correct <span class="math inline">\(y_c\)</span> class probabilities of an example, by:</p>
 <p><span class="math display">\[
 L(\hat y,y) = -\sum_c y_c \log \hat y_c
 \]</span></p>
-<p>Which usually reduces to <span class="math inline">\(L(\hat y, y) = - \hat y_c\)</span> since <span class="math inline">\(y\)</span> is typically a “hard” one-hot-encoded label. To use soft labels we just set <span class="math inline">\(y = f_{\text{big}}(x)\)</span>.</p>
-<p>These soft labels provide a much richer training signal for the smaller model, especially when the larger model distributes its probability mass across multiple classes (i.e.&nbsp;when the labels have high entropy). To force this high entropy, the authors propose increasing the temperature <span class="math inline">\(T\)</span> of the softmax layer in the larger model to produce the soft labels. The small model trains with this same temperature but then sets it to one during testing.</p>
+<p>To use soft labels we just set <span class="math inline">\(y = f_{\text{big}}(x)\)</span>.</p>
+<p>These soft labels provide a much richer training signal for the smaller model, especially when the larger model distributes its probability mass across multiple classes (i.e.&nbsp;when the labels have high entropy). To force this high entropy, the authors propose increasing the temperature <span class="math inline">\(T\)</span> of the softmax layer in the larger model to produce the soft labels. The small model trains with this same temperature but then sets it to 1 during testing.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/demo.png" class="img-fluid figure-img"></p>
 <figcaption>Increasing the temperature of the big model produces softer and more informative labels.</figcaption>
 </figure>
 </div>
-<p>They also had better results by adding a small term to the loss function with the regular hard-labeled, <span class="math inline">\(T=1\)</span>, cross-entropy. The reasoning is that the model may not have enough capacity to learn the soft targets, so <em>“erring in the direction of the correct answer turns out to be helpful”</em>. If we write the output of a model with temperature <span class="math inline">\(T\)</span> as <span class="math inline">\(f(x; T)\)</span>, then the complete loss is</p>
+<p>They also had better results by adding a small term to the loss function with the regular hard-labeled cross-entropy. The reasoning is that the model may not have enough capacity to learn the soft targets, so <em>“erring in the direction of the correct answer turns out to be helpful”</em>. If we write the output of a model with temperature <span class="math inline">\(T\)</span> as <span class="math inline">\(f(x; T)\)</span>, then the complete loss is</p>
 <p><span class="math display">\[
 L_{\text{distill}}(x,y) = a T^2 \cdot L\left[ f_{\text{small}}(x; T), f_{\text{big}}(x; T) \right] + (1-a) \cdot L \left [ f_{\text{small}}(x; 1), y \right ]
 \]</span></p>
