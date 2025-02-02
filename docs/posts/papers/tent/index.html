@@ -283,10 +283,10 @@ Figure&nbsp;2: More corruption (shown as alpha) leads to higher loss and entropy
 </div>
 </div>
 </div>
-<p>The intuition here as far as I can tell is that entropy encodes the model’s confidence. If the model’s prediction is confident it is <em>all-in-all</em> more probable to be correct (it might have seen similar examples during training, the example might be “easy”, etc). Corruptions take the model OOD and decrease its confidence. Since cross-entropy is lowest when all probability mass is assigned to the correct label, increasing entropy (all-in-all) dilutes that mass and increases loss.</p>
+<p>The intuition here, as far as I can tell, is that entropy encodes the model’s confidence. If the model’s prediction is confident, it is all-in-all more probable to be correct (it might have seen similar examples during training, the example might be “easy”, etc). Corruptions take the model OOD and decrease its confidence. Since cross-entropy is lowest when all probability mass is assigned to the correct label, increasing entropy (all-in-all) dilutes that mass and increases loss.</p>
 <p>Two important notes on <em>how</em> entropy is minimized:</p>
 <p>First, the authors note that once we switch the model to entropy minimization we run the risk of causing it to deviate from its training. While you could choose a sufficiently small learning rate or add KL regularization to alleviate this, the authors opt for freezing most of the model and only updating the learnable parameters in the batch norm layers.</p>
-<p>Second, we must use batches. If we minimize single examples we’ll just assign all of the mass to the most likely class.</p>
+<p>Second, we must use batches. If we minimize single examples the model might just learn to assign more mass to that class instead of something more generalizable.</p>
 <div id="cell-fig-demo" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>TENT example</summary>
@@ -349,7 +349,7 @@ Figure&nbsp;2: More corruption (shown as alpha) leads to higher loss and entropy
 <img src="index_files/figure-html/fig-demo-output-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: TENT produces class distributions with less entropy, concentrating mass in fewer classes.
+Figure&nbsp;3: TENT learns to output class distributions with less entropy, with the hope of doing better in out-of-distribution (here corrupted) settings.
 </figcaption>
 </figure>
 </div>
@@ -516,7 +516,7 @@ Figure&nbsp;4: TENT &amp; Norm consistently outperform the unadapted model, with
 <img src="index_files/figure-html/fig-grid-output-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: TENT consistently outperforms other methods across corruption types.
+Figure&nbsp;5: TENT is sensitive to learning rate and batch size. Note that in practice these are scaled together.
 </figcaption>
 </figure>
 </div>
@@ -528,7 +528,7 @@ Figure&nbsp;5: TENT consistently outperforms other methods across corruption typ
 <img src="index_files/figure-html/fig-grid-output-2.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6: Mean entropy over test set
+Figure&nbsp;6: TENT reaches lower entropy than Norm.
 </figcaption>
 </figure>
 </div>
@@ -536,8 +536,8 @@ Figure&nbsp;6: Mean entropy over test set
 </div>
 </div>
 <p>You can see that TENT seems quite sensitive to hyperparameters, which is a <a href="https://arxiv.org/abs/2306.03536">common challenge</a> to all Test-Time Adaptation methods. There definitely seems to be an entropy sweet-spot – presumably specific to the dataset and shift – controlled by the learning rate and batch size.</p>
-<p>Wrapping up, TENT is a compelling TTA method. You can use a pre-trained model and don’t require test-time labels. However, the technique is limited to classification, <a href="https://arxiv.org/pdf/2410.10894v1">miscalibrates models</a> (makes them overconfident) or online learning (we need batches), and is sensitive to hyperparameters.</p>
-<p><em>All-in-all</em> it was an interesting paper and introduced me to the test-time adaptation literature.</p>
+<p>So? TENT has some drawbacks. It is limited to classification (as far as I can tell), can <a href="https://arxiv.org/pdf/2410.10894v1">make models overconfident</a>, cannot be applied online (we need batches), and is sensitive to hyperparameters. However, you do not need test-time labels and can use a pretrained model. Most importantly, the technique is simple, intuitive, and seems to work.</p>
+<p><em>All-in-all</em> it was an interesting paper, introduced me to the test-time adaptation literature, and was worth the read.</p>
 
 
 
