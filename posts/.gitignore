@@ -8,6 +8,7 @@ models/
 data/
 imgs/
 nets/
+wandb/
 
 
 # Byte-compiled / optimized / DLL files
