@@ -36,8 +36,11 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type = int, required = True)
     parser.add_argument('--outdir', default = 'models/sft', type = str)
     parser.add_argument('--wandb', default = True, type = bool)
-    parser.add_argument('--debug', default = False, type = bool)
+    parser.add_argument('--debug', action = 'store_true')
     args = parser.parse_args()
+
+    os.environ['WANDB_DISABLED'] = 'true' if not args.wandb or args.debug else 'false'
+
 
     model_name = 'HuggingFaceTB/SmolLM2-135M'
     tokenizer_name = 'HuggingFaceTB/SmolLM2-135M-Instruct' # Need the instruct version for chat template
@@ -96,7 +99,8 @@ if __name__ == '__main__':
         wandb.init(
             project = 'salsa-sft-training',
             name = f'sft_seed_{args.seed}',
-            config = {'seed': args.seed}
+            config = {'seed': args.seed},
+            save_code = True
         )
 
     sft_config = SFTConfig(
@@ -127,7 +131,7 @@ if __name__ == '__main__':
         log_level = 'info',
         logging_strategy = 'steps',
         overwrite_output_dir = True,
-        report_to = 'wandb' if args.wandb else None,
+        report_to = 'wandb' if args.wandb and not args.debug else None,
 
         hub_strategy = 'every_save',
         hub_model_id = f'SmolLM2-135M-SFT-{args.seed}',
