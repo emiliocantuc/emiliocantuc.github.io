@@ -26,13 +26,16 @@ ecantuc[at]umich[dot]edu
 
 [LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [X](https://x.com/emiliocantuc) | [Github](https://github.com/emiliocantuc) | [Posts](posts)
 
-## publications
+Some of my favorite [book highlights](https://highlights.cervini.casa/)
+
+## preprints
 - E. Cantu-Cervini. *Personalized Federated Learning via Stacking*. [[arxiv](https://arxiv.org/abs/2404.10957)] [[code](https://github.com/emiliocantuc/personalized-fl-via-stacking/)]
 
 ## pet projects
 - [Horarios ITAM](https://horariositam.com/): A schedule planner for ITAM undergrads with about 3k monthly visitors. [done]
 - [Awesome Umich Orgs](https://emiliocantuc.github.io/awesome-umich-orgs): Explore similar student orgs by closest neighbors in embedding space. [done]
 - [My Wolverine Events](https://mywolverine.events/): Get event recommendations from U of M (learning about recsys). [in dev]
+- 
 
 ## posts
 
