@@ -1,4 +1,7 @@
 # Custom
+sequential-tests/
+w2v/
+natality/
 .DS_Store
 nohup.out
 *.zip
@@ -9,6 +12,7 @@ data/
 imgs/
 nets/
 wandb/
+.
 
 
 # Byte-compiled / optimized / DLL files
