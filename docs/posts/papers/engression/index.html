@@ -242,7 +242,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
 <p>We walk through how simple engression is to implement and attempt to reproduce Figure 4 from the paper, which highlights its extrapolation capabilities using synthetic data.</p>
 <p>We implement <span class="math inline">\(g(x, \varepsilon) \mapsto y\)</span> as a MLP. In the paper, the authors feed the concatenated vector <span class="math inline">\([x, \varepsilon]\)</span> into a standard (deterministic) network. To keep things flexible and modular — and since <span class="math inline">\(\varepsilon\)</span> must be sampled independently of <span class="math inline">\(x\)</span> — we can instead:</p>
-<div id="485baf7e" class="cell" data-execution_count="55">
+<div id="485baf7e" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Defining g(x, eps)</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> gConcatenate(nn.Module):</span>
@@ -268,7 +268,7 @@ window.Quarto = {
 </div>
 <p>Of course, there are many different ways one could define <span class="math inline">\(g\)</span> beyond concatenating the noise with the input. I’m sure future work will explore them.</p>
 <p>Now, define the loss function:</p>
-<div id="24ad86f1" class="cell">
+<div id="24ad86f1" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>engression loss</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> engression_loss(y, preds, p <span class="op">=</span> <span class="dv">2</span>, return_terms <span class="op">=</span> <span class="va">False</span>):</span>
@@ -298,7 +298,7 @@ window.Quarto = {
 </details>
 </div>
 <p>And a simple training loop:</p>
-<div id="f6ca290b" class="cell" data-execution_count="57">
+<div id="f6ca290b" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Training loop</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train(g, dl, m, lr <span class="op">=</span> <span class="fl">0.001</span>, epochs <span class="op">=</span> <span class="dv">100</span>, verbose <span class="op">=</span> <span class="va">True</span>):</span>
@@ -327,7 +327,7 @@ window.Quarto = {
 </details>
 </div>
 <p>Finally, we attempt to replicate Figure 4 from the paper using simulated data with pre-additive noise. For the <code>softplus</code> case, for example, we generate <span class="math inline">\(X \sim \text{Unif}[-2, 2]\)</span>, <span class="math inline">\(\eta \sim \mathcal N(0, 1)\)</span> and set <span class="math inline">\(Y = g^\ast(x + \eta)\)</span> with <span class="math inline">\(g^\ast(t) = \log(1+\exp(t))\)</span>. We then train simple MLPs using the engression loss and evaluate their ability to recover the true median — given by <span class="math inline">\(g^\ast(x)\)</span> — especially outside the range of the training data.</p>
-<div id="63f80c15" class="cell" data-execution_count="59">
+<div id="63f80c15" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Synthetic data</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>g_stars <span class="op">=</span> {</span>
@@ -598,7 +598,7 @@ What if the data is not pre-additive?
 <span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>torch.save((quantiles, stats), <span class="st">'logs/m_noise_scale.pt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="fd9269f9" class="cell" data-execution_count="8">
+<div id="fd9269f9" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -620,13 +620,13 @@ What if the data is not pre-additive?
 </div>
 </div>
 </div>
-<p>Above, we fixed <span class="math inline">\(m\)</span> and varied <span class="math inline">\(\sigma_\varepsilon\)</span>. But in general, <span class="math inline">\(m\)</span>, <span class="math inline">\(\sigma_\varepsilon\)</span>, and the dimensionality of <span class="math inline">\(\varepsilon\)</span> appear to be interdependent. For example (speculating), increasing <span class="math inline">\(\sigma_\varepsilon\)</span> might require lower noise dimensionality to avoid exploding variance, or perhaps lower <span class="math inline">\(m\)</span> values suffer more under high-variance noise due to noisier gradient estimates. These interactions are currently not well understood.</p>
-<p>Future work should explore the interplay between these hyperparameters. Tuning them jointly will likely be important for practical applications, especially when using engression in more complex or real-world settings.</p>
+<p>Above, we fixed <span class="math inline">\(m\)</span> and varied <span class="math inline">\(\sigma_\varepsilon\)</span>. But in general, <span class="math inline">\(m\)</span>, <span class="math inline">\(\sigma_\varepsilon\)</span>, and the dimensionality of <span class="math inline">\(\varepsilon\)</span> appear to be interdependent. For example (speculating), increasing <span class="math inline">\(\sigma_\varepsilon\)</span> might require lower noise dimensionality to avoid exploding variance, or perhaps lower <span class="math inline">\(m\)</span> values suffer more under high-variance noise due to noisier gradient estimates.</p>
+<p>It would be interesting to study the interplay between them. Tuning them jointly will likely be important for practical applications.</p>
 </section>
 <section id="final-thoughts" class="level2">
 <h2 class="anchored" data-anchor-id="final-thoughts">Final thoughts</h2>
 <p>While we focused on the main loss explored in the paper, the authors mention several generalizations in Appendix D. Specifically, the energy score is one example of a broader class of kernel scores, and engression can in principle use any proper scoring rule that characterizes a distribution (see Section 2). I wouldn’t be surprised if future work develops variants that emphasize the tails, which could be especially useful in risk-sensitive applications.</p>
-<p>Engression’s main strength lies in its simplicity and flexibility. It requires no parametric assumptions on the output distribution, no likelihood computations, no adversarial training, and no architectural constraints like invertibility. It scales naturally to multivariate <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, and at test time, sampling is fast and trivially parallelizable. These properties make it particularly appealing for tasks like forecasting, simulation, or structured prediction, where calibrated uncertainty is important but explicit density evaluation is not.</p>
+<p>Engression’s main strength lies in its simplicity and flexibility. It requires no parametric assumptions on the output distribution, no likelihood computations, no adversarial training, and no architectural constraints like invertibility. It scales naturally to multivariate <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, and at test time, sampling is fast and easily parallelizable. These properties make it particularly appealing for tasks like forecasting, simulation, or structured prediction, where calibrated uncertainty is important but explicit density evaluation is not.</p>
 <p>That said, engression comes with tradeoffs. Because it models distributions implicitly — without yielding closed-form densities — it’s less suitable for inference tasks that rely on likelihoods. Its one-shot sampling may also struggle with complex, multimodal distributions, as the energy score tends to cover modes rather than <a href="https://sander.ai/2020/03/24/audio-generation.html#mode-covering-vs-mode-seeking-behaviour">seek them</a>. In such cases, methods like diffusion models or normalizing flows might offer better performance, albeit at higher computational and implementation cost.</p>
 <p>Encouragingly, the authors have begun to explore extensions. A recent <a href="https://arxiv.org/abs/2502.13747v1">paper</a> proposes a multi-step version of engression that improves performance on challenging tasks. Another work introduces <a href="https://arxiv.org/abs/2404.13649">distributional autoencoders</a>, combining engression with dimensionality reduction.</p>
 <p>Overall, engression is a clever and lightweight approach to distributional regression. I’m excited to see where future research and applications take it. The <a href="https://arxiv.org/abs/2307.00835">paper</a> is very readable, and the authors have released their code <a href="https://github.com/xwshen51/engression/">here</a> if you want to play with it. I’m also learning about python packaging — here’s a <a href="https://github.com/emiliocantuc/engression-pytorch">small one</a> with the loss and a few wrappers for convenience.</p>
