@@ -166,6 +166,7 @@ window.Quarto = {
   <li><a href="#pre-additive-noise-and-extrapolation" id="toc-pre-additive-noise-and-extrapolation" class="nav-link" data-scroll-target="#pre-additive-noise-and-extrapolation">Pre-additive noise and extrapolation</a></li>
   <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
   <li><a href="#hyperparameters" id="toc-hyperparameters" class="nav-link" data-scroll-target="#hyperparameters">Hyperparameters</a></li>
+  <li><a href="#real-data" id="toc-real-data" class="nav-link" data-scroll-target="#real-data">Real data</a></li>
   <li><a href="#final-thoughts" id="toc-final-thoughts" class="nav-link" data-scroll-target="#final-thoughts">Final thoughts</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/emiliocantuc/emiliocantuc.github.io/blob/main/posts/papers/engression/index.ipynb" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div><div class="quarto-other-links"><h2>Other Links</h2><ul><li><a href="https://arxiv.org/abs/2307.00835"><i class="bi bi-book"></i>Paper</a></li></ul></div></nav>
@@ -194,6 +195,12 @@ window.Quarto = {
     </div>
   </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">May 12, 2025</p>
+    </div>
+  </div>
     
   </div>
   
@@ -223,6 +230,7 @@ window.Quarto = {
 \frac{1}{n} \left [ \frac{1}{m} \sum_{j=1}^m  \| Y_i - g(X_i, \varepsilon_{i,j}) \| - \frac{1}{2m(m-1)} \sum_{j=1}^m \sum_{j'=1}^m \|g(X_i, \varepsilon_{i, j}) - g(X_i, \varepsilon_{i, j'})  \|\right]
 \]</span></p>
 <p>Once trained, <span class="math inline">\(g\)</span> acts as an <em>implicit</em> and <em>generative</em> model for <span class="math inline">\(Y \mid X\)</span>. It doesn’t yield an explicit density <span class="math inline">\(p(y \mid x)\)</span>, but we can generate samples by sampling <span class="math inline">\(\varepsilon\)</span> and feeding it into <span class="math inline">\(g\)</span>. From these samples, we can estimate means, medians, confidence intervals, etc. as usual.</p>
+<p>Note: While we focused on the main loss explored in the paper, the authors mention several generalizations in Appendix D. Specifically, the energy score is one example of a broader class of kernel scores, and engression can in principle use any proper scoring rule that characterizes a distribution (see Section 2). I wouldn’t be surprised if future work develops variants that emphasize the tails, which could be especially useful in risk-sensitive applications.</p>
 </section>
 <section id="pre-additive-noise-and-extrapolation" class="level2">
 <h2 class="anchored" data-anchor-id="pre-additive-noise-and-extrapolation">Pre-additive noise and extrapolation</h2>
@@ -623,9 +631,21 @@ What if the data is not pre-additive?
 <p>Above, we fixed <span class="math inline">\(m\)</span> and varied <span class="math inline">\(\sigma_\varepsilon\)</span>. But in general, <span class="math inline">\(m\)</span>, <span class="math inline">\(\sigma_\varepsilon\)</span>, and the dimensionality of <span class="math inline">\(\varepsilon\)</span> appear to be interdependent. For example (speculating), increasing <span class="math inline">\(\sigma_\varepsilon\)</span> might require lower noise dimensionality to avoid exploding variance, or perhaps lower <span class="math inline">\(m\)</span> values suffer more under high-variance noise due to noisier gradient estimates.</p>
 <p>It would be interesting to study the interplay between them. Tuning them jointly will likely be important for practical applications.</p>
 </section>
+<section id="real-data" class="level2">
+<h2 class="anchored" data-anchor-id="real-data">Real data</h2>
+<p>So far we’ve focused on toy problems and synthetic experiments, but the authors of the engression paper also evaluate the method on real datasets in Section 4. They benchmark engression on both univariate and multivariate tasks — including point prediction, interval estimation, and full distributional modeling — and compare it against standard approaches like L2 and L1 regression, as well as <a href="https://www.jmlr.org/papers/volume7/meinshausen06a/meinshausen06a.pdf">quantile regression forests</a>. Engression consistently outperforms these baselines, especially when extrapolating.</p>
+<p>In their experiments, the authors use a MLP trained directly on the tabular inputs. But it’s <a href="https://arxiv.org/abs/2207.08815">well known</a> that deep nets are not particularly strong on tabular data (although this might be <a href="https://www.nature.com/articles/s41586-024-08328-6">changing</a>). That said, there’s nothing inherent in engression that requires you to use a neural network end-to-end. You can just as easily treat the engression-trained MLP as a modular head and stack it on top of any strong tabular model.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/stacking_engression.svg" class="img-fluid figure-img"></p>
+<figcaption>We can stack engression on top of any base model</figcaption>
+</figure>
+</div>
+<p>I <a href="_temperature.ipynb">tried</a> this idea on a probabilistic forecasting <a href="https://www.kaggle.com/competitions/probabilistic-forecasting-i-temperature/overview">competition</a>, where the goal was to predict a set of conditional quantiles (0.05 through 0.95). The winning submission used <a href="https://catboost.ai/">catboost</a> with a multi-quantile loss, followed by <a href="https://en.wikipedia.org/wiki/Conformal_prediction">conformal prediction</a> to generate calibrated intervals. I took their base CatBoost model — which outputs quantile predictions — and replaced the conformalization step with a small MLP trained using engression (i.e., with the energy score). It ended up beating the winning model’s <a href="https://en.wikipedia.org/wiki/Scoring_rule#Conditional_continuous_ranked_probability_score">CRPS score</a> by about 0.04 on the private test set, without any additional hyperparameter tuning. (For context, the difference between first and second place was 0.06.)</p>
+<p>I think this kind of stacking could make engression much more versatile in practice. I’m looking forward to exploring more applications.</p>
+</section>
 <section id="final-thoughts" class="level2">
 <h2 class="anchored" data-anchor-id="final-thoughts">Final thoughts</h2>
-<p>While we focused on the main loss explored in the paper, the authors mention several generalizations in Appendix D. Specifically, the energy score is one example of a broader class of kernel scores, and engression can in principle use any proper scoring rule that characterizes a distribution (see Section 2). I wouldn’t be surprised if future work develops variants that emphasize the tails, which could be especially useful in risk-sensitive applications.</p>
 <p>Engression’s main strength lies in its simplicity and flexibility. It requires no parametric assumptions on the output distribution, no likelihood computations, no adversarial training, and no architectural constraints like invertibility. It scales naturally to multivariate <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, and at test time, sampling is fast and easily parallelizable. These properties make it particularly appealing for tasks like forecasting, simulation, or structured prediction, where calibrated uncertainty is important but explicit density evaluation is not.</p>
 <p>That said, engression comes with tradeoffs. Because it models distributions implicitly — without yielding closed-form densities — it’s less suitable for inference tasks that rely on likelihoods. Its one-shot sampling may also struggle with complex, multimodal distributions, as the energy score tends to cover modes rather than <a href="https://sander.ai/2020/03/24/audio-generation.html#mode-covering-vs-mode-seeking-behaviour">seek them</a>. In such cases, methods like diffusion models or normalizing flows might offer better performance, albeit at higher computational and implementation cost.</p>
 <p>Encouragingly, the authors have begun to explore extensions. A recent <a href="https://arxiv.org/abs/2502.13747v1">paper</a> proposes a multi-step version of engression that improves performance on challenging tasks. Another work introduces <a href="https://arxiv.org/abs/2404.13649">distributional autoencoders</a>, combining engression with dimensionality reduction.</p>
