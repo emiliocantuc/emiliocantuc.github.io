@@ -198,7 +198,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 12, 2025</p>
+      <p class="date-modified">May 18, 2025</p>
     </div>
   </div>
     
@@ -533,7 +533,7 @@ What if the data is not pre-additive?
 <p>Engression introduces a couple of hyperparameters related to the noise vectors (<span class="math inline">\(\varepsilon\)</span>) sampled during training: namely, <span class="math inline">\(m\)</span>, the number of noise samples per example, and the distribution from which <span class="math inline">\(\varepsilon\)</span> is drawn. For example, in their synthetic data experiments, the authors set <span class="math inline">\(m = 2\)</span> and sample <span class="math inline">\(\varepsilon \sim \text{Unif}[0, 1]^{100}\)</span>.</p>
 <p>The parameter <span class="math inline">\(m\)</span> controls an accuracy–compute trade-off. Increasing <span class="math inline">\(m\)</span> means we obtain a better Monte Carlo estimate of the population engression loss, and hence of the conditional distribution. However, this also increases compute: the cost of computing the loss grows linearly in <span class="math inline">\(m\)</span> for the first term but quadratically for the second, since we compute pairwise distances.</p>
 <p>That said, since these are Monte Carlo estimates, we expect diminishing returns as <span class="math inline">\(m\)</span> increases. Another consolation point is that we can combat the quadratic cost by training for more epochs, at the expense of noisier gradients. This allows the model to revisit each example with different noise vectors, increasing the “effective” <span class="math inline">\(m\)</span>.</p>
-<p>To test this, we vary <span class="math inline">\(m\)</span> on a toy example. We observe that, given enough data and epochs, all runs eventually reach similar loss values. However, models with higher <span class="math inline">\(m\)</span> converge faster and more stably. Interestingly, the conditional median tends to be learned first, with the tails filling in later.</p>
+<p>To test this, we vary <span class="math inline">\(m\)</span> on a toy example. We observe that, given enough data and epochs, all runs eventually reach similar loss values. However, models with higher <span class="math inline">\(m\)</span> converge faster and more stably. Perhaps not surprisingly, the conditional median tends to be learned first, with the tails filling in later.</p>
 <!-- TODO find reference pointers for last sentence -->
 <div id="b2df4995" class="cell" data-execution_count="10">
 <details class="code-fold">
@@ -617,7 +617,7 @@ What if the data is not pre-additive?
 </div>
 </div>
 <p>While the only formal requirement on the noise distribution is that <span class="math inline">\(\varepsilon\)</span> be independent of <span class="math inline">\(x\)</span>, its specific choice can have important practical implications. For instance, the authors show that increasing the standard deviation of <span class="math inline">\(\varepsilon\)</span> can improve extrapolation.</p>
-<p>In our toy setup, the effect of <span class="math inline">\(\sigma_\varepsilon\)</span> resembles a smoothing or locality knob <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>: smaller values produce predictions that are tightly concentrated around the training targets, encouraging sharp interpolation. Larger <span class="math inline">\(\sigma_\varepsilon\)</span> values lead to more diffuse predictions, smoothing out local variations and potentially blurring fine-grained structure. While this may benefit extrapolation in other settings (as shown in the paper), here it hints at a trade-off: excessive noise could dampen the model’s ability to fit in-domain details.</p>
+<p>In our toy setup, the effect of <span class="math inline">\(\sigma_\varepsilon\)</span> resembles a smoothing or locality parameter: large values encourage distant <span class="math inline">\(x\)</span>’s to map to the same <span class="math inline">\(y\)</span>, producing smoother estimates. Imagining one-dimensional <span class="math inline">\(\varepsilon\)</span> and <span class="math inline">\(g(x + \varepsilon)\)</span> (instead of concatenating) should help with this intuition. While larger values benefit extrapolation in other settings (as shown in the paper), here we see that it could hurt in-domain.</p>
 <div id="917c82b5" class="cell">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -633,16 +633,16 @@ What if the data is not pre-additive?
 </section>
 <section id="real-data" class="level2">
 <h2 class="anchored" data-anchor-id="real-data">Real data</h2>
-<p>So far we’ve focused on toy problems and synthetic experiments, but the authors of the engression paper also evaluate the method on real datasets in Section 4. They benchmark engression on both univariate and multivariate tasks — including point prediction, interval estimation, and full distributional modeling — and compare it against standard approaches like L2 and L1 regression, as well as <a href="https://www.jmlr.org/papers/volume7/meinshausen06a/meinshausen06a.pdf">quantile regression forests</a>. Engression consistently outperforms these baselines, especially when extrapolating.</p>
-<p>In their experiments, the authors use a MLP trained directly on the tabular inputs. But it’s <a href="https://arxiv.org/abs/2207.08815">well known</a> that deep nets are not particularly strong on tabular data (although this might be <a href="https://www.nature.com/articles/s41586-024-08328-6">changing</a>). That said, there’s nothing inherent in engression that requires you to use a neural network end-to-end. You can just as easily treat the engression-trained MLP as a modular head and stack it on top of any strong tabular model.</p>
+<p>So far, we’ve focused on toy problems and synthetic experiments, but the authors of the engression paper also evaluate the method on real datasets in Section 4. They benchmark engression on both univariate and multivariate tasks — including point prediction, interval estimation, and full distributional modeling — and compare it against standard approaches like L2 and L1 regression, as well as <a href="https://www.jmlr.org/papers/volume7/meinshausen06a/meinshausen06a.pdf">quantile regression forests</a>. Engression consistently outperforms these baselines, especially when extrapolating.</p>
+<p>In their experiments, the authors use a MLP trained directly on the tabular inputs. But it’s <a href="https://arxiv.org/abs/2207.08815">well known</a> that deep nets are not particularly strong on tabular data (although this might be <a href="https://www.nature.com/articles/s41586-024-08328-6">changing</a>). That said, there’s nothing inherent in engression that requires us to use a neural network end-to-end. We could just as easily treat the engression-trained MLP as a modular head and stack it on top of any strong tabular model.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/stacking_engression.svg" class="img-fluid figure-img"></p>
 <figcaption>We can stack engression on top of any base model</figcaption>
 </figure>
 </div>
-<p>I <a href="_temperature.ipynb">tried</a> this idea on a probabilistic forecasting <a href="https://www.kaggle.com/competitions/probabilistic-forecasting-i-temperature/overview">competition</a>, where the goal was to predict a set of conditional quantiles (0.05 through 0.95). The winning submission used <a href="https://catboost.ai/">catboost</a> with a multi-quantile loss, followed by <a href="https://en.wikipedia.org/wiki/Conformal_prediction">conformal prediction</a> to generate calibrated intervals. I took their base CatBoost model — which outputs quantile predictions — and replaced the conformalization step with a small MLP trained using engression (i.e., with the energy score). It ended up beating the winning model’s <a href="https://en.wikipedia.org/wiki/Scoring_rule#Conditional_continuous_ranked_probability_score">CRPS score</a> by about 0.04 on the private test set, without any additional hyperparameter tuning. (For context, the difference between first and second place was 0.06.)</p>
-<p>I think this kind of stacking could make engression much more versatile in practice. I’m looking forward to exploring more applications.</p>
+<p>I tried <a href="_temperature.ipynb">this</a> idea on a probabilistic forecasting <a href="https://www.kaggle.com/competitions/probabilistic-forecasting-i-temperature/overview">competition</a>, where the goal was to predict a set of conditional quantiles (0.05 through 0.95). The winning submission had used <a href="https://catboost.ai/">catboost</a> with a multi-quantile loss, followed by <a href="https://en.wikipedia.org/wiki/Conformal_prediction">conformal prediction</a>. Keeping the base model and replacing the conformalization step with a small engression-trained MLP improved on the winning model’s <a href="https://en.wikipedia.org/wiki/Scoring_rule#Conditional_continuous_ranked_probability_score">CRPS score</a> by about 0.04 on the private test set<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> – without tuning any of the engression hyperparameters. I thought this was impressive, as conformalization is the go-to calibration method right now. Of course, if you wanted finite-sample guarantees, you could still conformalize on top.</p>
+<p>The broader point is that the pre-additive noise assumption underlying engression appears to hold up on real-world datasets — and that stacking engression as a flexible head could make it a practical upgrade to existing tabular pipelines.</p>
 </section>
 <section id="final-thoughts" class="level2">
 <h2 class="anchored" data-anchor-id="final-thoughts">Final thoughts</h2>
@@ -660,7 +660,7 @@ What if the data is not pre-additive?
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Imagining one-dimensional <span class="math inline">\(\varepsilon\)</span> and <span class="math inline">\(g(x + \varepsilon)\)</span> (instead of concatenating) should help with this intuition.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>For context, the difference between first and second place was 0.06.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
