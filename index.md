@@ -11,7 +11,7 @@ listing:
     - '!posts/index.md'
   sort: "date desc"
   fields: [image, date, title, subtitle, categories, reading-time]
-  max-items: 5
+  max-items: 3
 ---
 
 # Emilio Cantu-Cervini
@@ -24,11 +24,16 @@ I did my undergrad in Computer Engineering at [ITAM](https://itam.mx/) in Mexico
 
 ecantuc[at]umich[dot]edu
 
-[LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [X](https://x.com/emiliocantuc) | [Github](https://github.com/emiliocantuc) | [Posts](posts)
+[Github](https://github.com/emiliocantuc) | [X](https://x.com/emiliocantuc) | [LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [Posts](posts)
 
-## preprints
-- E. Cantu-Cervini. *Personalized Federated Learning via Stacking*. [[arxiv](https://arxiv.org/abs/2404.10957)] [[code](https://github.com/emiliocantuc/personalized-fl-via-stacking/)]
+## posts
 
+I've been trying to write as I learn about cs, stats, and ml. Latest:
+
+::: {#posts-listing}
+:::
+
+Read more [here](posts).
 
 ## pet projects
 - [Horarios ITAM](https://horariositam.com/): A schedule planner for ITAM undergrads with about 3k monthly visitors. [done]
@@ -39,11 +44,6 @@ Some quick hacky ones:
 - [Awesome Umich Orgs](https://emiliocantuc.github.io/awesome-umich-orgs): Explore similar student orgs in embedding space.
 - [moonwise](https://github.com/emiliocantuc/moonwise): Sync and manage book highlights. See some of my [favorite highlights](https://highlights.cervini.casa/). 
 
-## posts
 
-I've been trying to write as I learn about cs, stats, and ml. Here are the latest:
-
-::: {#posts-listing}
-:::
-
-Read more [here](posts).
+## preprints
+- E. Cantu-Cervini. *Personalized Federated Learning via Stacking*. [[arxiv](https://arxiv.org/abs/2404.10957)] [[code](https://github.com/emiliocantuc/personalized-fl-via-stacking/)]
