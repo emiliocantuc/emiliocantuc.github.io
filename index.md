@@ -42,7 +42,7 @@ Read more [here](posts).
 Some quick hacky ones:
 
 - [Awesome Umich Orgs](https://emiliocantuc.github.io/awesome-umich-orgs): Explore similar student orgs in embedding space.
-- [moonwise](https://github.com/emiliocantuc/moonwise): Sync and manage book highlights. See some of my [favorite highlights](https://highlights.cervini.casa/). 
+- [moonwise](https://github.com/emiliocantuc/moonwise): Sync and manage book highlights. See some of my [favorite highlights](https://highlights.ecntu.com/). 
 
 
 ## preprints
