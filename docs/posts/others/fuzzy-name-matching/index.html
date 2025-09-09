@@ -305,8 +305,8 @@ window.Quarto = {
 </table>
 <p>After playing around a little, I settled on using only two features for simplicity:</p>
 <ul>
-<li>A string similarity between the profile names. Went for <code>token_sort_ratio</code> since it handles missing words and is not sensitive to order. For example, “Juan Perez” and “J. Perez” score a perfect 1.</li>
-<li>A string similarity between the departments. Because a professor could have multiple school departments (extracted from the classes they give that semester) I simply took the maximum of the similarities (<code>token_set_ratio</code> here).</li>
+<li>A string similarity between the profile names. Went for <a href="https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#token-sort-ratio"><code>token_sort_ratio</code></a> since it handles missing words and is not sensitive to order. For example, “Juan Perez” and “J. Perez” score a perfect 1.</li>
+<li>A string similarity between the departments. Because a professor could have multiple school departments (extracted from the classes they give that semester) I simply took the maximum of the similarities (<a href="https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#token-set-ratio"><code>token_set_ratio</code></a> here).</li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">

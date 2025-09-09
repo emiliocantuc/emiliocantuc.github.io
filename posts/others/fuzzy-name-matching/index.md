@@ -76,8 +76,8 @@ Besides the names from both platforms, I also included professors' departments:
 
 After playing around a little, I settled on using only two features for simplicity:
 
-- A string similarity between the profile names. Went for `token_sort_ratio` since it handles missing words and is not sensitive to order. For example, "Juan Perez" and "J. Perez" score a perfect 1.
-- A string similarity between the departments. Because a professor could have multiple school departments (extracted from the classes they give that semester) I simply took the maximum of the similarities (`token_set_ratio` here). 
+- A string similarity between the profile names. Went for [`token_sort_ratio`](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#token-sort-ratio) since it handles missing words and is not sensitive to order. For example, "Juan Perez" and "J. Perez" score a perfect 1.
+- A string similarity between the departments. Because a professor could have multiple school departments (extracted from the classes they give that semester) I simply took the maximum of the similarities ([`token_set_ratio`](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#token-set-ratio) here). 
 
 ![Features per class for the training set. There are `k=10` times as many negatives as positives. You can see how the negative examples are too easy because the string similarity for randomly sampled pairs is really low.](images/feature_scatter.png)
 
