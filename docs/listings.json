@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/others/fuzzy-name-matching/index.html",
       "/posts/papers/engression/index.html",
       "/posts/papers/distilling-knowledge/index.html",
       "/posts/papers/tent/index.html",
