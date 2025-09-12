@@ -38,6 +38,7 @@ Read more [here](posts).
 ## pet projects
 - [Horarios ITAM](https://horariositam.com/): A schedule planner for ITAM undergrads with about 3k monthly visitors. [done]
 - [My Wolverine Events](https://mywolverine.events/): Get event recommendations from U of M (learning about recsys). [in dev]
+- [ML Katas](https://mlkatas.com): Share machine learning exercises and make it easy for LLMs to generate custom ones for you.
 
 Some quick hacky ones:
 
