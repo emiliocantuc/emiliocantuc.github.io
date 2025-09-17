@@ -4,6 +4,7 @@ subtitle: "just trying to learn and write"
 listing:
   contents:
     - '*.ipynb'
+    - 'index.md'
   fields: [image, date, title, subtitle, categories, description, reading-time]
   sort: "date desc"
   type: default
