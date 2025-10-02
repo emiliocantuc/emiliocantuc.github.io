@@ -6,29 +6,27 @@ format:
     css: assets/styles.css
 listing:
   id: posts-listing
+  type: grid
   contents:
     - posts
     - '!posts/index.md'
   sort: "date desc"
-  fields: [image, date, title, subtitle, categories, reading-time]
+  fields: [image, date, title, subtitle, reading-time]
   max-items: 3
 ---
 
 # Emilio Cantu
-
-Computer Engineering B.S. ([ITAM](https://itam.mx/)) & Applied Statistics M.S. (University of Michigan).
-
-<!-- ::: {.column-margin} -->
 ![](assets/pp.jpeg){#pp}
-<!-- ::: -->
+
+Computer Engineering B.S. ([ITAM](https://itam.mx/)) & Applied Statistics M.S. ([UMICH](https://umich.edu/))
 
 ecantuc[at]umich[dot]edu
 
-[Github](https://github.com/emiliocantuc) | [X](https://x.com/emiliocantuc) | [LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [Posts](posts)
+[Github](https://github.com/emiliocantuc) | [X](https://x.com/emiliocantuc) | [LinkedIn](https://www.linkedin.com/in/emilio-cantu-cervini-24b2541b6/) | [Blog](posts)
 
 ## posts
 
-I've been trying to write as I learn about cs, stats, and ml. Latest:
+I try to write as I learn about CS, stats, and ML. Latest:
 
 ::: {#posts-listing}
 :::
@@ -42,9 +40,8 @@ Read more [here](posts).
 
 Some quick hacky ones:
 
-- [Awesome Umich Orgs](https://emiliocantuc.github.io/awesome-umich-orgs): Explore similar student orgs in embedding space.
 - [moonwise](https://github.com/emiliocantuc/moonwise): Sync and manage book highlights. See some of my [favorite highlights](https://highlights.ecntu.com/). 
-
+- [Awesome Umich Orgs](https://emiliocantuc.github.io/awesome-umich-orgs): Explore similar student orgs in embedding space.
 
 ## preprints
 - E. Cantu-Cervini. *Personalized Federated Learning via Stacking*. [[arxiv](https://arxiv.org/abs/2404.10957)] [[code](https://github.com/emiliocantuc/personalized-fl-via-stacking/)]
