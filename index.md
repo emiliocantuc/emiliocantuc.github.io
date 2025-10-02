@@ -1,5 +1,5 @@
 ---
-pagetitle: Emilio Cantu-Cervini
+pagetitle: Emilio Cantu
 navbar: false
 format:
   html:
@@ -14,13 +14,13 @@ listing:
   max-items: 3
 ---
 
-# Emilio Cantu-Cervini
+# Emilio Cantu
 
-I did my undergrad in Computer Engineering at [ITAM](https://itam.mx/) in Mexico City and am now pursuing a Master's in Applied Statistics at the University of Michigan.
+Computer Engineering B.S. ([ITAM](https://itam.mx/)) & Applied Statistics M.S. (University of Michigan).
 
-::: {.column-margin}
+<!-- ::: {.column-margin} -->
 ![](assets/pp.jpeg){#pp}
-:::
+<!-- ::: -->
 
 ecantuc[at]umich[dot]edu
 
