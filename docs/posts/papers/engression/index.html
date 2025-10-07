@@ -198,7 +198,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 2, 2025</p>
+      <p class="date-modified">October 6, 2025</p>
     </div>
   </div>
     
@@ -225,23 +225,24 @@ window.Quarto = {
 <figcaption>If we only used the first term in the engression loss, our estimated distribution would collapse. Toy example where <span class="math inline">\(Y|X \sim N(X, 0.1)\)</span></figcaption>
 </figure>
 </div>
-<p>To minimize the empirical version of the loss using a dataset <span class="math inline">\(\{(X_i, Y_i): i=1, \dots, n\}\)</span>, we sample <span class="math inline">\(m\)</span> noise vectors <span class="math inline">\(\varepsilon\)</span> <em>per</em> observation and minimize</p>
+<p>To minimize the empirical version of the loss using a dataset <span class="math inline">\(\{(X_i, Y_i): i=1, \dots, n\}\)</span>, we sample <span class="math inline">\(m\)</span> noise vectors <span class="math inline">\(\varepsilon\)</span> <em>per</em> <span class="math inline">\(i\)</span>-th observation and minimize</p>
 <p><span class="math display">\[
-\frac{1}{n} \left [ \frac{1}{m} \sum_{j=1}^m  \| Y_i - g(X_i, \varepsilon_{i,j}) \| - \frac{1}{2m(m-1)} \sum_{j=1}^m \sum_{j'=1}^m \|g(X_i, \varepsilon_{i, j}) - g(X_i, \varepsilon_{i, j'})  \|\right]
+\frac{1}{n} \sum_{i=1}^n \left [ \frac{1}{m} \sum_{j=1}^m  \| Y_i - g(X_i, \varepsilon_{i,j}) \| - \frac{1}{2m(m-1)} \sum_{j=1}^m \sum_{j'=1}^m \|g(X_i, \varepsilon_{i, j}) - g(X_i, \varepsilon_{i, j'})  \|\right]
 \]</span></p>
-<p>Once trained, <span class="math inline">\(g\)</span> acts as an <em>implicit</em> and <em>generative</em> model for <span class="math inline">\(Y \mid X\)</span>. It doesn’t yield an explicit density <span class="math inline">\(p(y \mid x)\)</span>, but we can generate samples by sampling <span class="math inline">\(\varepsilon\)</span> and feeding it into <span class="math inline">\(g\)</span>. From these samples, we can estimate means, medians, confidence intervals, etc. as usual.</p>
+<p>Once trained, <span class="math inline">\(g\)</span> acts as an <em>implicit</em> and <em>generative</em> model for <span class="math inline">\(Y \mid X\)</span>. That is, <span class="math inline">\(g\)</span> won’t give us an explicit density <span class="math inline">\(P(Y=y \mid X=x)\)</span>, but we can use it to obtain samples from <span class="math inline">\(Y \mid X=x\)</span>. We independently draw as much <span class="math inline">\(\varepsilon\)</span>’s as we want observations and feed them into <span class="math inline">\(g\)</span> to get <span class="math inline">\(\{ g(x, \varepsilon_j) \}_{j=1}^K\)</span>. With the samples, we can estimate means, medians, confidence intervals, etc. as usual.</p>
 <p>Note: While we focused on the main loss explored in the paper, the authors mention several generalizations in Appendix D. Specifically, the energy score is one example of a broader class of kernel scores, and engression can in principle use any proper scoring rule that characterizes a distribution (see Section 2). I wouldn’t be surprised if future work develops variants that emphasize the tails, which could be especially useful in risk-sensitive applications.</p>
 </section>
 <section id="pre-additive-noise-and-extrapolation" class="level2">
 <h2 class="anchored" data-anchor-id="pre-additive-noise-and-extrapolation">Pre-additive noise and extrapolation</h2>
 <p>While minimizing the loss above is sufficient to learn the conditional distribution within the training range (assuming <span class="math inline">\(g\)</span> is expressive enough), the authors show that, under certain assumptions about the noise structure, engression can also support limited extrapolation.</p>
-<p>Most regression and generative models assume that the noise is post-additive. That is, that noise <span class="math inline">\(\eta\)</span> is added after applying a nonlinear transformation to the covariates: <span class="math inline">\(Y = g(X) + \eta\)</span>. Pre-additive noise instead assumes <span class="math inline">\(Y = g(X + \eta)\)</span>. This helps with extrapolation because, as the authors note</p>
+<p>Most regression and generative models assume that the noise is post-additive. That is, that noise <span class="math inline">\(\eta\)</span> is added after applying a nonlinear transformation to the covariates: <span class="math inline">\(Y = g(X) + \eta\)</span>. Pre-additive noise instead assumes <span class="math inline">\(Y = g(X + \eta)\)</span>. This helps with extrapolation because, as the authors note:</p>
 <blockquote class="blockquote">
-<p>“As such, if the data are generated according to a post-ANM, the observations for the response variable are perturbed values of the true function evaluated at covariate values within the support. We hence generally have no data-driven information about the behaviour of the true function outside the support. In contrast, data generated from a pre-ANM contain response values that reveal some information beyond the support”</p>
+<p>“As such, if the data are generated according to a post-ANM, the observations for the response variable are perturbed values of the true function evaluated at covariate values within the support. We hence generally have no data-driven information about the behaviour of the true function outside the support. In contrast, data generated from a pre-ANM contain response values that reveal some information beyond the support”.</p>
 </blockquote>
 <div class="quarto-figure quarto-figure-left">
 <figure class="figure">
-<p><img src="images/noise.png" class="img-fluid quarto-figure quarto-figure-left figure-img"></p>
+<p><img src="images/noise.svg" class="img-fluid figure-img"></p>
+<figcaption>With a pre-Additive Noise Model (right) we gain information beyond the training support. Illustrated here with only two points. The blue and orange dots represent the possible values for <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> respectively due to noise from <span class="math inline">\(\eta\)</span>.</figcaption>
 </figure>
 </div>
 <p>The authors formalize this and show that under certain structural assumptions — like smoothness or monotonicity of <span class="math inline">\(g\)</span>, and symmetric pre-additive noise — engression can recover aspects of <span class="math inline">\(g\)</span> beyond the training range. A key idea is that larger input noise gives you more indirect coverage of nearby regions, so the model can “see” a bit past the edge of the data. I won’t go into the technical details here, but the extrapolation results are interesting and worth checking out if you’re curious.</p>
@@ -250,7 +251,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
 <p>We walk through how simple engression is to implement and attempt to reproduce Figure 4 from the paper, which highlights its extrapolation capabilities using synthetic data.</p>
 <p>We implement <span class="math inline">\(g(x, \varepsilon) \mapsto y\)</span> as a MLP. In the paper, the authors feed the concatenated vector <span class="math inline">\([x, \varepsilon]\)</span> into a standard (deterministic) network. To keep things flexible and modular — and since <span class="math inline">\(\varepsilon\)</span> must be sampled independently of <span class="math inline">\(x\)</span> — we can instead:</p>
-<div id="485baf7e" class="cell" data-execution_count="3">
+<div id="485baf7e" class="cell">
 <details open="" class="code-fold">
 <summary>Defining g(x, eps)</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> gConcatenate(nn.Module):</span>
@@ -276,37 +277,36 @@ window.Quarto = {
 </div>
 <p>Of course, there are many different ways one could define <span class="math inline">\(g\)</span> beyond concatenating the noise with the input. I’m sure future work will explore them.</p>
 <p>Now, define the loss function:</p>
-<div id="24ad86f1" class="cell" data-execution_count="4">
+<div id="24ad86f1" class="cell" data-execution_count="87">
 <details open="" class="code-fold">
 <summary>engression loss</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> engression_loss(y, preds, p <span class="op">=</span> <span class="dv">2</span>, return_terms <span class="op">=</span> <span class="va">False</span>):</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> engression_loss(y, preds, return_terms <span class="op">=</span> <span class="va">False</span>):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">        y (torch.Tensor): True target values (batch_size, output_dim).</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">        preds (torch.Tensor): Predicted target with independently sampled noise (batch_size, m_samples, output_dim).</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">        p (float): The order of the norm to use for the loss calculation.</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">        return_terms (bool): If True, return the individual terms of the loss.</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> preds.shape[<span class="dv">0</span>] <span class="op">==</span> y.shape[<span class="dv">0</span>] <span class="kw">and</span> preds.shape[<span class="dv">2</span>] <span class="op">==</span> y.shape[<span class="dv">1</span>]</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    n, m, D <span class="op">=</span> preds.shape <span class="co"># n is batch_size, m is num_samples, D is output_dim</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">        return_terms (bool): If True, return the individual terms of the loss.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> y.shape[<span class="dv">0</span>] <span class="op">==</span> preds.shape[<span class="dv">0</span>] <span class="kw">and</span> y.shape[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> preds.shape[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    b, d <span class="op">=</span> y.shape</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    b, m, d <span class="op">=</span> preds.shape</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Term 1: the absolute error between the predicted and true values</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    term1 <span class="op">=</span> torch.linalg.vector_norm(preds <span class="op">-</span> y[:, <span class="va">None</span>, :], <span class="bu">ord</span> <span class="op">=</span> p, dim <span class="op">=</span> <span class="dv">2</span>).mean()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    term1 <span class="op">=</span> torch.linalg.vector_norm(preds <span class="op">-</span> y[:, <span class="va">None</span>, :], <span class="bu">ord</span> <span class="op">=</span> <span class="dv">2</span>, dim <span class="op">=</span> <span class="dv">2</span>).mean()</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Term 2: pairwise absolute differences between the predicted values</span></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    term2 <span class="op">=</span> torch.tensor(<span class="fl">0.0</span>, device <span class="op">=</span> preds.device, dtype <span class="op">=</span> preds.dtype)</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> m <span class="op">&gt;</span> <span class="dv">1</span>:</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># cdist is convinient. The result shape before sum is (n, m, m).</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        sum_pairwise_l1_dists <span class="op">=</span> torch.cdist(preds, preds, p <span class="op">=</span> p).<span class="bu">sum</span>()</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        term2 <span class="op">=</span> <span class="op">-</span> sum_pairwise_l1_dists <span class="op">/</span> (n <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> m <span class="op">*</span> (m <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> D)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (term1 <span class="op">+</span> term2, term1, term2) <span class="cf">if</span> return_terms <span class="cf">else</span> term1 <span class="op">+</span> term2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># cdist is convinient. The result shape before mean is (n, m, m).</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        mean_pairwise_l2_dists <span class="op">=</span> torch.cdist(preds, preds, p <span class="op">=</span> <span class="dv">2</span>).mean()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        term2 <span class="op">=</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> mean_pairwise_l2_dists <span class="op">*</span> m <span class="op">/</span> (m <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (term1 <span class="op">+</span> term2, term1, term2) <span class="cf">if</span> return_terms <span class="cf">else</span> term1 <span class="op">+</span> term2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>And a simple training loop:</p>
-<div id="f6ca290b" class="cell" data-execution_count="5">
+<div id="f6ca290b" class="cell" data-execution_count="88">
 <details open="" class="code-fold">
 <summary>Training loop</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train(g, dl, m, lr <span class="op">=</span> <span class="fl">0.001</span>, epochs <span class="op">=</span> <span class="dv">100</span>, verbose <span class="op">=</span> <span class="va">True</span>):</span>
@@ -335,7 +335,7 @@ window.Quarto = {
 </details>
 </div>
 <p>Finally, we attempt to replicate Figure 4 from the paper using simulated data with pre-additive noise. For the <code>softplus</code> case, for example, we generate <span class="math inline">\(X \sim \text{Unif}[-2, 2]\)</span>, <span class="math inline">\(\eta \sim \mathcal N(0, 1)\)</span> and set <span class="math inline">\(Y = g^\ast(x + \eta)\)</span> with <span class="math inline">\(g^\ast(t) = \log(1+\exp(t))\)</span>. We then train simple MLPs using the engression loss and evaluate their ability to recover the true median — given by <span class="math inline">\(g^\ast(x)\)</span> — especially outside the range of the training data.</p>
-<div id="63f80c15" class="cell" data-execution_count="7">
+<div id="63f80c15" class="cell" data-execution_count="90">
 <details class="code-fold">
 <summary>Synthetic data</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>g_stars <span class="op">=</span> {</span>
@@ -380,7 +380,7 @@ window.Quarto = {
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> train_data(<span class="dv">1000</span>, <span class="dv">1</span>, <span class="bu">type</span> <span class="op">=</span> <span class="st">'softplus'</span>, pre_additive_noise <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="e01519ce" class="cell" data-execution_count="60">
+<div id="e01519ce" class="cell" data-execution_count="94">
 <details class="code-fold">
 <summary>Figure 4</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>input_dim, hidden_dim, output_dim <span class="op">=</span> <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">1</span></span>
@@ -401,97 +401,95 @@ window.Quarto = {
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>saved_l1_preds <span class="op">=</span> {}</span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>extra <span class="op">=</span> <span class="st">'_post'</span> <span class="cf">if</span> <span class="kw">not</span> pre_additive_noise <span class="cf">else</span> <span class="st">''</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>saved_g_preds <span class="op">=</span> torch.load(<span class="ss">f'logs/saved_g_preds</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.pt'</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>saved_l1_preds <span class="op">=</span> torch.load(<span class="ss">f'logs/saved_l1_preds</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.pt'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># saved_g_preds = torch.load(f'logs/saved_g_preds{extra}.pt')</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># saved_l1_preds = torch.load(f'logs/saved_l1_preds{extra}.pt')</span></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>f, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize <span class="op">=</span> (<span class="dv">7</span>, <span class="dv">7</span>))</span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name, g_star), ax <span class="kw">in</span> <span class="bu">zip</span>(g_stars.items(), axs.flatten()):</span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># print(name)</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> torch.linspace(x_test_lims[name][<span class="dv">0</span>], x_test_lims[name][<span class="dv">1</span>], <span class="dv">25</span>)[:, <span class="va">None</span>]</span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> torch.linspace(x_test_lims[name][<span class="dv">0</span>], x_test_lims[name][<span class="dv">1</span>], <span class="dv">25</span>)[:, <span class="va">None</span>]</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cache to fix plot, etc</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> name <span class="kw">in</span> saved_g_preds:</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        g_preds <span class="op">=</span> saved_g_preds[name]</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        g_preds <span class="op">=</span> []</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(n_runs):</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>            set_seed(seed)</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>            <span class="co"># model = MLP(input_dim + noise_dim, [hidden_dim] * depth(name), output_dim)</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>            model <span class="op">=</span> ResMLP(input_dim <span class="op">+</span> noise_dim, hidden_dim, depth(name), output_dim)</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>            g <span class="op">=</span> gConcatenate(model, noise_dim <span class="op">=</span> noise_dim, noise_type <span class="op">=</span> <span class="st">'normal'</span>)</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>            X, Y <span class="op">=</span> train_data(ds_size(name), input_dim, <span class="bu">type</span> <span class="op">=</span> name, pre_additive_noise <span class="op">=</span> pre_additive_noise)</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> torch.utils.data.DataLoader(<span class="bu">list</span>(<span class="bu">zip</span>(X, Y)), batch_size <span class="op">=</span> batch_size <span class="cf">if</span> batch_size <span class="cf">else</span> <span class="bu">len</span>(Y), shuffle <span class="op">=</span> <span class="va">True</span>, drop_last <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cache to fix plot, etc</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> name <span class="kw">in</span> saved_g_preds:</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        g_preds <span class="op">=</span> saved_g_preds[name]</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        g_preds <span class="op">=</span> []</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(n_runs):</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>            set_seed(seed)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>            <span class="co"># model = MLP(input_dim + noise_dim, [hidden_dim] * depth(name), output_dim)</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>            model <span class="op">=</span> ResMLP(input_dim <span class="op">+</span> noise_dim, hidden_dim, depth(name), output_dim)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>            g <span class="op">=</span> gConcatenate(model, noise_dim <span class="op">=</span> noise_dim, noise_type <span class="op">=</span> <span class="st">'normal'</span>)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>            X, Y <span class="op">=</span> train_data(ds_size(name), input_dim, <span class="bu">type</span> <span class="op">=</span> name, pre_additive_noise <span class="op">=</span> pre_additive_noise)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> torch.utils.data.DataLoader(<span class="bu">list</span>(<span class="bu">zip</span>(X, Y)), batch_size <span class="op">=</span> batch_size <span class="cf">if</span> batch_size <span class="cf">else</span> <span class="bu">len</span>(Y), shuffle <span class="op">=</span> <span class="va">True</span>, drop_last <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>            losses <span class="op">=</span> train(g, dl, m_train, epochs <span class="op">=</span> epochs, verbose <span class="op">=</span> <span class="va">False</span>, lr <span class="op">=</span> lr(name))</span>
 <span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>            losses <span class="op">=</span> train(g, dl, m_train, epochs <span class="op">=</span> epochs, verbose <span class="op">=</span> <span class="va">False</span>, lr <span class="op">=</span> lr(name))</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Predict the median using g: sample m_pred per point and take the median</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> torch.no_grad():</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                g.<span class="bu">eval</span>()</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>                g_pred <span class="op">=</span> torch.quantile(</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>                    torch.stack([g(t) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(m_pred)], dim <span class="op">=</span> <span class="dv">1</span>), q <span class="op">=</span> <span class="fl">0.5</span>, dim <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>                )</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>                g_preds.append(g_pred)</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        g_preds <span class="op">=</span> torch.stack(g_preds)</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        saved_g_preds[name] <span class="op">=</span> g_preds</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># L1 baseline</span></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> name <span class="kw">in</span> saved_l1_preds:</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>        l1_preds <span class="op">=</span> saved_l1_preds[name]</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>        l1_preds <span class="op">=</span> []</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(n_runs):</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>            set_seed(seed)</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>            model <span class="op">=</span> ResMLP(input_dim, hidden_dim, depth(name), output_dim)</span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>            X, Y <span class="op">=</span> train_data(ds_size(name), input_dim, <span class="bu">type</span> <span class="op">=</span> name, pre_additive_noise <span class="op">=</span> <span class="va">True</span>)</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> torch.utils.data.DataLoader(<span class="bu">list</span>(<span class="bu">zip</span>(X, Y)), batch_size <span class="op">=</span> batch_size <span class="cf">if</span> batch_size <span class="cf">else</span> <span class="bu">len</span>(Y), shuffle <span class="op">=</span> <span class="va">True</span>, drop_last <span class="op">=</span> <span class="va">True</span>)</span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>            l1_losses <span class="op">=</span> train_l1(model, dl, epochs <span class="op">=</span> epochs, verbose <span class="op">=</span> <span class="va">False</span>, lr <span class="op">=</span> lr(name))</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> torch.no_grad():</span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>                model.<span class="bu">eval</span>()</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>                l1_preds.append(model(t))</span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>        l1_preds <span class="op">=</span> torch.stack(l1_preds)</span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>        saved_l1_preds[name] <span class="op">=</span> l1_preds</span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    X, Y <span class="op">=</span> train_data(ds_size(name), <span class="dv">1</span>, <span class="bu">type</span> <span class="op">=</span> name, pre_additive_noise <span class="op">=</span> <span class="va">True</span>)</span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>    ax.scatter(X[:<span class="dv">5000</span>], Y[:<span class="dv">5000</span>], color <span class="op">=</span> <span class="st">'gray'</span>,  alpha <span class="op">=</span> <span class="fl">0.1</span>, s <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, g_star(t), label <span class="op">=</span> <span class="ss">f'True g'</span>, color <span class="op">=</span> <span class="st">'red'</span>)</span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, l1_preds.mean(dim <span class="op">=</span> <span class="dv">0</span>), color <span class="op">=</span> <span class="st">'tab:blue'</span>, label <span class="op">=</span> <span class="st">'L1'</span>)</span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(t.flatten(),</span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>        l1_preds.quantile(<span class="fl">0.10</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>        l1_preds.quantile(<span class="fl">0.90</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span></span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, g_preds.mean(dim <span class="op">=</span> <span class="dv">0</span>), color <span class="op">=</span> <span class="st">'tab:orange'</span>, label <span class="op">=</span> <span class="st">'engression'</span>)</span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(t.flatten(),</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>        g_preds.quantile(<span class="fl">0.10</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>        g_preds.quantile(<span class="fl">0.90</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="st">'tab:orange'</span></span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name)</span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">0</span>, <span class="dv">0</span>].legend()</span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>, <span class="dv">1</span>].set_ylim((<span class="op">-</span><span class="dv">2</span>, <span class="dv">5</span>))</span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>, <span class="dv">0</span>].set_ylim((<span class="op">-</span><span class="dv">10</span>, <span class="dv">80</span>))</span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>f.tight_layout()</span>
-<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>f.savefig(<span class="ss">f'images/figure4</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.png'</span>, dpi <span class="op">=</span> <span class="dv">300</span>, bbox_inches <span class="op">=</span> <span class="st">'tight'</span>)</span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>torch.save(saved_g_preds, <span class="ss">f'logs/saved_g_preds</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.pt'</span>)</span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>torch.save(saved_l1_preds, <span class="ss">f'logs/saved_l1_preds</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.pt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Predict the median using g: sample m_pred per point and take the median</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                g.<span class="bu">eval</span>()</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                g_pred <span class="op">=</span> torch.quantile(</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                    torch.stack([g(t) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(m_pred)], dim <span class="op">=</span> <span class="dv">1</span>), q <span class="op">=</span> <span class="fl">0.5</span>, dim <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>                g_preds.append(g_pred)</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>        g_preds <span class="op">=</span> torch.stack(g_preds)</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>        saved_g_preds[name] <span class="op">=</span> g_preds</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="co"># L1 baseline</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> name <span class="kw">in</span> saved_l1_preds:</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        l1_preds <span class="op">=</span> saved_l1_preds[name]</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>        l1_preds <span class="op">=</span> []</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(n_runs):</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>            set_seed(seed)</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>            model <span class="op">=</span> ResMLP(input_dim, hidden_dim, depth(name), output_dim)</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>            X, Y <span class="op">=</span> train_data(ds_size(name), input_dim, <span class="bu">type</span> <span class="op">=</span> name, pre_additive_noise <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>            dl <span class="op">=</span> torch.utils.data.DataLoader(<span class="bu">list</span>(<span class="bu">zip</span>(X, Y)), batch_size <span class="op">=</span> batch_size <span class="cf">if</span> batch_size <span class="cf">else</span> <span class="bu">len</span>(Y), shuffle <span class="op">=</span> <span class="va">True</span>, drop_last <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>            l1_losses <span class="op">=</span> train_l1(model, dl, epochs <span class="op">=</span> epochs, verbose <span class="op">=</span> <span class="va">False</span>, lr <span class="op">=</span> lr(name))</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>                model.<span class="bu">eval</span>()</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>                l1_preds.append(model(t))</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>        l1_preds <span class="op">=</span> torch.stack(l1_preds)</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>        saved_l1_preds[name] <span class="op">=</span> l1_preds</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    X, Y <span class="op">=</span> train_data(ds_size(name), <span class="dv">1</span>, <span class="bu">type</span> <span class="op">=</span> name, pre_additive_noise <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>    ax.scatter(X[:<span class="dv">5000</span>], Y[:<span class="dv">5000</span>], color <span class="op">=</span> <span class="st">'gray'</span>,  alpha <span class="op">=</span> <span class="fl">0.1</span>, s <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, g_star(t), label <span class="op">=</span> <span class="ss">f'True g'</span>, color <span class="op">=</span> <span class="st">'red'</span>)</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, l1_preds.mean(dim <span class="op">=</span> <span class="dv">0</span>), color <span class="op">=</span> <span class="st">'tab:blue'</span>, label <span class="op">=</span> <span class="st">'L1'</span>)</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(t.flatten(),</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>        l1_preds.quantile(<span class="fl">0.10</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>        l1_preds.quantile(<span class="fl">0.90</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>    ax.plot(t, g_preds.mean(dim <span class="op">=</span> <span class="dv">0</span>), color <span class="op">=</span> <span class="st">'tab:orange'</span>, label <span class="op">=</span> <span class="st">'engression'</span>)</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>    ax.fill_between(t.flatten(),</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>        g_preds.quantile(<span class="fl">0.10</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>        g_preds.quantile(<span class="fl">0.90</span>, dim <span class="op">=</span> <span class="dv">0</span>).flatten(),</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="st">'tab:orange'</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name)</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">0</span>, <span class="dv">0</span>].legend()</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>, <span class="dv">1</span>].set_ylim((<span class="op">-</span><span class="dv">2</span>, <span class="dv">5</span>))</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>, <span class="dv">0</span>].set_ylim((<span class="op">-</span><span class="dv">10</span>, <span class="dv">80</span>))</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>f.tight_layout()</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>f.savefig(<span class="ss">f'images/figure4</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.png'</span>, dpi <span class="op">=</span> <span class="dv">300</span>, bbox_inches <span class="op">=</span> <span class="st">'tight'</span>)</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>torch.save(saved_g_preds, <span class="ss">f'logs/saved_g_preds</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.pt'</span>)</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>torch.save(saved_l1_preds, <span class="ss">f'logs/saved_l1_preds</span><span class="sc">{</span>extra<span class="sc">}</span><span class="ss">.pt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -502,14 +500,14 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>We find, as the authors do, that while both methods perform similarly in-domain, engression is much better extrapolating than L1 regression — at least for monotone and pre-additively generated data.</p>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="What if the data is not pre-additive?">
+<p>We find, as the authors do, that while both methods perform similarly in-domain, engression is much better extrapolating than L1 regression — at least for monotone and with data generated with pre-additive noise.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="What if the noise is not pre-additive?">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-What if the data is not pre-additive?
+What if the noise is not pre-additive?
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -530,12 +528,12 @@ What if the data is not pre-additive?
 </section>
 <section id="hyperparameters" class="level2">
 <h2 class="anchored" data-anchor-id="hyperparameters">Hyperparameters</h2>
-<p>Engression introduces a couple of hyperparameters related to the noise vectors (<span class="math inline">\(\varepsilon\)</span>) sampled during training: namely, <span class="math inline">\(m\)</span>, the number of noise samples per example, and the distribution from which <span class="math inline">\(\varepsilon\)</span> is drawn. For example, in their synthetic data experiments, the authors set <span class="math inline">\(m = 2\)</span> and sample <span class="math inline">\(\varepsilon \sim \text{Unif}[0, 1]^{100}\)</span>.</p>
-<p>The parameter <span class="math inline">\(m\)</span> controls an accuracy–compute trade-off. Increasing <span class="math inline">\(m\)</span> means we obtain a better Monte Carlo estimate of the population engression loss, and hence of the conditional distribution. However, this also increases compute: the cost of computing the loss grows linearly in <span class="math inline">\(m\)</span> for the first term but quadratically for the second, since we compute pairwise distances.</p>
-<p>That said, since these are Monte Carlo estimates, we expect diminishing returns as <span class="math inline">\(m\)</span> increases. Another consolation point is that we can combat the quadratic cost by training for more epochs, at the expense of noisier gradients. This allows the model to revisit each example with different noise vectors, increasing the “effective” <span class="math inline">\(m\)</span>.</p>
+<p>Engression introduces a couple of hyperparameters related to the noise vectors (<span class="math inline">\(\varepsilon\)</span>) sampled during training: namely, <span class="math inline">\(m\)</span>, the number of noise samples drawn per example, and the distribution from which <span class="math inline">\(\varepsilon\)</span> is drawn. For example, in their synthetic data experiments, the authors set <span class="math inline">\(m = 2\)</span> and sample <span class="math inline">\(\varepsilon \sim \text{Unif}[0, 1]^{100}\)</span>.</p>
+<p>The parameter <span class="math inline">\(m\)</span> controls a compute-variance trade-off during training. Increasing <span class="math inline">\(m\)</span> means we obtain a cleaner (lower variance) Monte Carlo estimate of the population engression loss and hence gradients. However, the cost of computing the loss grows linearly in <span class="math inline">\(m\)</span> for the first term but quadratically for the second, since we compute pairwise distances.</p>
+<p>That said, since these are Monte Carlo estimates, we expect diminishing returns as <span class="math inline">\(m\)</span> increases. Another consolation point is that we can try to combat the quadratic cost by training for more epochs. This allows the model to revisit each example with different noise vectors, effectively averaging over more noisy estimates of the loss.</p>
 <p>To test this, we vary <span class="math inline">\(m\)</span> on a toy example. We observe that, given enough data and epochs, all runs eventually reach similar loss values. However, models with higher <span class="math inline">\(m\)</span> converge faster and more stably. Perhaps not surprisingly, the conditional median tends to be learned first, with the tails filling in later.</p>
 <!-- TODO find reference pointers for last sentence -->
-<div id="b2df4995" class="cell" data-execution_count="10">
+<div id="b2df4995" class="cell">
 <details class="code-fold">
 <summary>Vary <span class="math inline">\(m\)</span> on toy data</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">5_000</span></span>
@@ -569,7 +567,7 @@ What if the data is not pre-additive?
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    set_seed(<span class="dv">69</span>)</span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    dl <span class="op">=</span> torch.utils.data.DataLoader(<span class="bu">list</span>(<span class="bu">zip</span>(X, Y)), batch_size <span class="op">=</span> mini_batch_size, shuffle <span class="op">=</span> <span class="va">False</span>)</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> ResMLP(input_dim <span class="op">=</span> input_dim <span class="op">+</span> noise_dim, hidden_dim <span class="op">=</span> hidden_dim, num_residual_blocks <span class="op">=</span> <span class="dv">2</span>, output_dim <span class="op">=</span> output_dim)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> ResMLP(in_dim <span class="op">=</span> input_dim <span class="op">+</span> noise_dim, hidden_dim <span class="op">=</span> hidden_dim, n_blocks <span class="op">=</span> <span class="dv">2</span>, out_dim <span class="op">=</span> output_dim)</span>
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> gConcatenate(model, noise_dim <span class="op">=</span> noise_dim, scale <span class="op">=</span> noise_scale)</span>
 <span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    optimizer <span class="op">=</span> torch.optim.Adam(g.parameters(), lr <span class="op">=</span> <span class="fl">1e-4</span>)</span>
@@ -616,8 +614,8 @@ What if the data is not pre-additive?
 </div>
 </div>
 </div>
-<p>While the only formal requirement on the noise distribution is that <span class="math inline">\(\varepsilon\)</span> be independent of <span class="math inline">\(x\)</span>, its specific choice can have important practical implications. For instance, the authors show that increasing the standard deviation of <span class="math inline">\(\varepsilon\)</span> can improve extrapolation.</p>
-<p>In our toy setup, the effect of <span class="math inline">\(\sigma_\varepsilon\)</span> resembles a smoothing or locality parameter: large values encourage distant <span class="math inline">\(x\)</span>’s to map to the same <span class="math inline">\(y\)</span>, producing smoother estimates. Imagining one-dimensional <span class="math inline">\(\varepsilon\)</span> and <span class="math inline">\(g(x + \varepsilon)\)</span> (instead of concatenating) should help with this intuition. While larger values benefit extrapolation in other settings (as shown in the paper), here we see that it could hurt in-domain.</p>
+<p>While the only formal requirement on the noise distribution is that <span class="math inline">\(\varepsilon\)</span> be independent of <span class="math inline">\(x\)</span>, its specific choice can have important practical implications.</p>
+<p>For instance, in our imperfect toy setup <span class="math inline">\(\sigma_\varepsilon\)</span> seems to resemble a smoothing or locality parameter: large values encourage distant <span class="math inline">\(x\)</span>’s to map to the same <span class="math inline">\(y\)</span>, producing smoother estimates. Imagining a one dimensional <span class="math inline">\(\varepsilon\)</span>, and <span class="math inline">\(g(x, \varepsilon) = g(x + \varepsilon)\)</span> should help with this intuition.</p>
 <div id="917c82b5" class="cell">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -628,12 +626,11 @@ What if the data is not pre-additive?
 </div>
 </div>
 </div>
-<p>Above, we fixed <span class="math inline">\(m\)</span> and varied <span class="math inline">\(\sigma_\varepsilon\)</span>. But in general, <span class="math inline">\(m\)</span>, <span class="math inline">\(\sigma_\varepsilon\)</span>, and the dimensionality of <span class="math inline">\(\varepsilon\)</span> appear to be interdependent. For example (speculating), increasing <span class="math inline">\(\sigma_\varepsilon\)</span> might require lower noise dimensionality to avoid exploding variance, or perhaps lower <span class="math inline">\(m\)</span> values suffer more under high-variance noise due to noisier gradient estimates.</p>
-<p>It would be interesting to study the interplay between them. Tuning them jointly will likely be important for practical applications.</p>
+<p>So, while sufficiently expressive model should in principle learn to correctly map any i.i.d. noise, in practice the choice of noise distribution may affect convergence speed and the quality of the learned conditional distribution.</p>
 </section>
 <section id="real-data" class="level2">
 <h2 class="anchored" data-anchor-id="real-data">Real data</h2>
-<p>So far, we’ve focused on toy problems and synthetic experiments, but the authors of the engression paper also evaluate the method on real datasets in Section 4. They benchmark engression on both univariate and multivariate tasks — including point prediction, interval estimation, and full distributional modeling — and compare it against standard approaches like L2 and L1 regression, as well as <a href="https://www.jmlr.org/papers/volume7/meinshausen06a/meinshausen06a.pdf">quantile regression forests</a>. Engression consistently outperforms these baselines, especially when extrapolating.</p>
+<p>So far, we’ve focused on toy problems and synthetic experiments, but the authors also evaluate the method on real datasets in Section 4. They benchmark both univariate and multivariate tasks — including point prediction, interval estimation, and full distributional modeling — and compare it against standard approaches like L2 and L1 regression, as well as <a href="https://www.jmlr.org/papers/volume7/meinshausen06a/meinshausen06a.pdf">quantile regression forests</a>. Engression consistently outperforms these baselines, especially when extrapolating.</p>
 <p>In their experiments, the authors use a MLP trained directly on the tabular inputs. But it’s <a href="https://arxiv.org/abs/2207.08815">well known</a> that deep nets are not particularly strong on tabular data (although this might be <a href="https://www.nature.com/articles/s41586-024-08328-6">changing</a>). That said, there’s nothing inherent in engression that requires us to use a neural network end-to-end. We could just as easily treat the engression-trained MLP as a modular head and stack it on top of any strong tabular model.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
